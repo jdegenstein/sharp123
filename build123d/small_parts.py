@@ -49,6 +49,8 @@ with BuildPart() as p_washer:
         Circle(washer_id / 2, mode=Mode.SUBTRACT)
     extrude(amount=washer_th)
 
+# TODO: add rectangular shaft retainer that will be used to retain angle adjustment screw
+
 packed = pack(
     [p_short_pin.part, p_long_pin.part, p_shaft.part, p_washer.part],
     padding=5,
