@@ -2,14 +2,14 @@
 from build123d import *
 from ocp_vscode import *
 from inspect import currentframe as cf
-import tangentline
+from tangentline import *
 
 set_port(3939)
 show_clear()
 set_defaults(ortho=True, default_edgecolor="#121212", reset_camera=Camera.KEEP)
 # %%
 
-clamp_th = 6
+clamp_th = 16
 hole_r = 5 / 2
 hole_pos = (0,0)
 hole_wall = 2
@@ -23,12 +23,6 @@ tip_r = 1 / 2
 # edge of the tip is front_len from origin (not the center of it) 
 tip_pos = (-front_len + tip_r, tip_r - hole_r_out)
 
-back = [
-  (0,hole_r_out),
-  (back_len, hole_r_out),
-  (back_len, hole_r_out - back_thick),
-  (hole_r_out + 5, hole_r_out - back_thick),
-]
 
 with BuildSketch() as s_helpers:
   with Locations(tip_pos):  
@@ -41,8 +35,14 @@ helpers = [
   s_helpers,
 ]  
   
-
-with BuildPart() as p_clamp:
+def clamp_shape(thick_offset=0):
+  back_thick2 = back_thick - thick_offset
+  back = [
+    (0,hole_r_out),
+    (back_len, hole_r_out),
+    (back_len, hole_r_out - back_thick2),
+    (hole_r_out + 5, hole_r_out - back_thick2),
+  ]  
   with BuildSketch() as s_clamp:
     with BuildLine() as l_clamp:
       l0 = DoubleCircleTangentLine(
@@ -60,11 +60,18 @@ with BuildPart() as p_clamp:
       TangentArc([back[3], a0 @1], tangent=(-1,0))
     make_face()
     Circle(hole_r, mode=Mode.SUBTRACT)
-  extrude(amount=clamp_th)
+  return s_clamp.sketch
 
+with BuildPart() as p_clamp:
+  with BuildSketch(Plane.XY) as s_clamp1:
+    add(clamp_shape(0))
+  # extrude(amount=clamp_th)
+  with BuildSketch(Plane.XY.offset(clamp_th)) as s_clamp2:
+    add(clamp_shape(2))
+  loft()
 
 show([
    p_clamp, 
-  *helpers,
+  # *helpers,
 ])
 # %%
