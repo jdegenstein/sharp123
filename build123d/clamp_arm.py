@@ -40,7 +40,9 @@ def clamp_shape(thick_offset=0):
   back = [
     (0,hole_r_out),
     (back_len, hole_r_out),
-    (back_len, hole_r_out - back_thick2),
+    (back_len, hole_r_out - back_thick -1),
+    (back_len - 5, hole_r_out - back_thick -1),
+    (back_len - 5, hole_r_out - back_thick2 ),
     (hole_r_out + 5, hole_r_out - back_thick2),
   ]  
   with BuildSketch() as s_clamp:
@@ -55,9 +57,10 @@ def clamp_shape(thick_offset=0):
       )
       centerarc_from_endpoints(tip_pos, tip_r, l0 @ 1, l1 @ 1, AngularDirection.CLOCKWISE)
       RadiusArc(l1 @ 0, back[0], hole_r_out)
-      FilletPolyline(back, radius=1)
+      Polyline(back)
+      # FilletPolyline(back, radius=1)
       a0 = CenterArc(hole_pos, hole_r_out, 270, 60)
-      TangentArc([back[3], a0 @1], tangent=(-1,0))
+      TangentArc([back[-1], a0 @1], tangent=(-1,0))
     make_face()
     # Circle(hole_r, mode=Mode.SUBTRACT)
   return s_clamp.sketch
@@ -75,6 +78,7 @@ with BuildPart() as p_clamp:
 
 show([
    p_clamp, 
-  #  *helpers,
+  # s_clamp1,
+   *helpers,
 ])
 # %%

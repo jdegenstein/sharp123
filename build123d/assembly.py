@@ -1,3 +1,4 @@
+# %%
 from build123d import *
 from ocp_vscode import *
 from inspect import currentframe as cf
@@ -60,7 +61,9 @@ for name, obj in variables:
             s_o.append(obj.sketch), s_n.append(f"{name}.{obj._obj_name}")
 show(
     *s_o,
-    packed,
-    names=s_n,
-    reset_camera=Camera.KEEP,
+    # packed,
+    # names=s_n,
+    # reset_camera=Camera.KEEP,
 )
+show(packed)
+# %%
