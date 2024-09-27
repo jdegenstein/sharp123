@@ -66,15 +66,14 @@ def clamp_shape(thick_offset=0):
   return s_clamp.sketch
 
 with BuildPart() as p_clamp:
-  with BuildSketch(Plane.XY) as s_clamp1:
-    add(clamp_shape(0))
-  with BuildSketch(Plane.XY.offset(clamp_th)) as s_clamp2:
-    add(clamp_shape(3))
-  loft()
-  with BuildSketch(faces().sort_by(Axis.Z)[0]) as s:
-    Plane().shift_origin((0,0,0))
-    Circle(hole_r)
-  extrude(amount=-clamp_th, mode=Mode.SUBTRACT)
+    with BuildSketch(Plane.XY) as s_clamp1:
+        add(clamp_shape(0))
+    with BuildSketch(Plane.XY.offset(clamp_th)) as s_clamp2:
+        add(clamp_shape(3))
+    loft()
+    with BuildSketch() as s:
+        Circle(hole_r)
+    extrude(amount=clamp_th, mode=Mode.SUBTRACT)
 
 show([
    p_clamp, 
