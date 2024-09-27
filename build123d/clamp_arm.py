@@ -74,7 +74,8 @@ def clamp_shape(back_ridge_height=0):
             poly=Polyline(back)
             # FilletPolyline(back, radius=1)
             a0 = CenterArc(hole_pos, hole_r_out, 270, 60)
-            TangentArc([poly@1, a0@1], tangent=a0%1, tangent_from_first=False)
+            # TangentArc([poly@1, a0@1], tangent=a0%1, tangent_from_first=False)
+            spl = Spline([poly @ 1, a0 @ 1], tangents=(poly % 1, -(a0 % 1)))
 
         make_face()
         # Circle(hole_r, mode=Mode.SUBTRACT)
