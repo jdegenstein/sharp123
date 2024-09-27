@@ -8,15 +8,15 @@ show_clear()
 set_defaults(ortho=True, default_edgecolor="#121212", reset_camera=Camera.KEEP)
 # %%
 
-clamp_th = 100
-hole_r = 8
+clamp_th = 80
+hole_r = 8 / 2
 hole_pos = (0, 0)
-hole_wall = 7
+hole_wall = 3
 hole_r_out = hole_r + hole_wall
-front_len = 100
-back_len = 100
+front_len = 50
+back_len = 50
 back_thick = hole_r_out
-back_ridge_width = 13
+back_ridge_width = 8
 
 tip_r = 3 / 2
 # tip is defined as a circle
@@ -37,7 +37,7 @@ helpers = [
 
 
 def clamp_shape(back_ridge_height=0):
-    back_thick2 = back_thick + back_ridge_height 
+    back_thick2 = back_thick + back_ridge_height
     back = [
         (0, hole_r_out),
         (back_len, hole_r_out),
@@ -71,12 +71,11 @@ def clamp_shape(back_ridge_height=0):
                 tip_pos, tip_r, l0 @ 1, l1 @ 1, AngularDirection.CLOCKWISE
             )
             RadiusArc(l1 @ 0, back[0], hole_r_out)
-            poly=Polyline(back)
+            poly = Polyline(back)
             # FilletPolyline(back, radius=1)
             a0 = CenterArc(hole_pos, hole_r_out, 270, 60)
             # TangentArc([poly@1, a0@1], tangent=a0%1, tangent_from_first=False)
             spl = Spline([poly @ 1, a0 @ 1], tangents=(poly % 1, -(a0 % 1)))
-
         make_face()
         # Circle(hole_r, mode=Mode.SUBTRACT)
     return s_clamp.sketch
@@ -93,11 +92,10 @@ with BuildPart() as p_clamp:
     extrude(amount=clamp_th, mode=Mode.SUBTRACT)
 
 
-
 show(
     [
         p_clamp,
-        # s_clamp1,
+        s_clamp1,
         *helpers,
     ]
 )
