@@ -6,7 +6,15 @@ from tangentline import *
 set_port(3939)
 show_clear()
 set_defaults(ortho=True, default_edgecolor="#121212", reset_camera=Camera.KEEP)
+import importlib
+import project_dimensions
+
 # %%
+
+importlib.reload(project_dimensions)
+clamp_arm = project_dimensions.project_dimensions.clamp_arm
+internal_width = clamp_arm.internal_width
+print(internal_width) # changes with save of project_dimensions.py
 
 clamp_th = 80
 hole_r = 8 / 2
