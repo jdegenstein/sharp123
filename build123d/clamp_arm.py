@@ -1,3 +1,4 @@
+# %%
 from build123d import *
 from ocp_vscode import *
 from inspect import currentframe as cf
@@ -5,7 +6,7 @@ from tangentline import *
 
 set_port(3939)
 show_clear()
-set_defaults(ortho=True, default_edgecolor="#121212", reset_camera=Camera.KEEP)
+set_defaults(ortho=True, default_edgecolor="#121212", reset_camera=Camera.KEEP, render_joints=True)
 import importlib
 import project_dimensions
 
@@ -16,7 +17,7 @@ clamp_arm = project_dimensions.project_dimensions.clamp_arm
 internal_width = clamp_arm.internal_width
 print(internal_width) # changes with save of project_dimensions.py
 
-clamp_th = 80
+clamp_th = internal_width
 hole_r = 8 / 2
 hole_pos = (0, 0)
 hole_wall = 3
@@ -99,11 +100,20 @@ with BuildPart() as p_clamp:
         Circle(hole_r)
     extrude(amount=clamp_th, mode=Mode.SUBTRACT)
 
+with Locations(Plane.XY):
+    locs = GridLocations(1, 1, 1, 1)
+    for l in locs:
+        print(l)
+
+RigidJoint('left',to_part=p_clamp, joint_location=hole_out.location)
 
 show(
     [
         p_clamp,
-        s_clamp1,
-        *helpers,
+    #   p_clamp.joints['left'],
+#        s_clamp1,
+#        *helpers,
     ]
 )
+
+# %%

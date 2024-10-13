@@ -44,7 +44,7 @@ class BasePlate:
 @dataclass
 class ClampArm:
     # just placeholder dimensions below
-    internal_width: float = 80
+    internal_width: float = 40
 
 
 @dataclass
