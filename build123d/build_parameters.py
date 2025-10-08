@@ -7,9 +7,9 @@ class BuildParameters:
     and attaches them as attributes to itself upon exit.
     
     Example:
-        with BuildParameters() as param:
+        with BuildParameters() as params:
             my_var = 100
-        print(param.my_var)  # Output: 100
+        print(params.my_var)  # Output: 100
     """
     def __init__(self):
         """Initializes the context manager's internal state."""
@@ -46,7 +46,7 @@ class BuildParameters:
         fields = {
             key: final_locals[key]
             for key in new_keys
-            if not isinstance(final_locals[key], ConMgrData)
+            if not isinstance(final_locals[key], BuildParameters)
         }
 
         # *** KEY CHANGE ***
