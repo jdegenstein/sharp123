@@ -3,66 +3,82 @@ from typing import Any
 
 class BuildParameters:
     """
-    A context manager that captures variables defined within its scope
-    and attaches them as attributes to itself upon exit.
-    
+    A context manager for building configuration objects.
+    Variables must be explicitly assigned to the instance, but nested 
+    builders are automatically attached to their parent upon exit.
+
+    Args:
+        frozen (bool): Defaults to True. When True, the object is locked 
+            upon exiting the 'with' block, preventing accidental mutations. 
+            If False, the object remains mutable.
+            
+            ⚠️ USE AT YOUR OWN RISK: If `frozen=False`, modifying a base 
+            parameter later will NOT automatically update any dependent or 
+            derived parameters. This builder evaluates calculations statically 
+            at the time of execution; it does not create reactive bindings.
+
     Example:
-        with BuildParameters() as params:
-            my_var = 100
-        print(params.my_var)  # Output: 100
+        with BuildParameters(frozen=True) as p:
+            p.radius = 1.5
+            p.diameter = p.radius * 2
+
+        # p.radius = 2.0  <-- Raises AttributeError (frozen)
+        
+        # If frozen=False, p.radius = 2.0 is allowed, but p.diameter 
+        # will permanently remain 3.0.
     """
-    def __init__(self):
-        """Initializes the context manager's internal state."""
-        self._caller_frame = None
-        self._initial_locals_keys = set()
+    
+    # Class-level stack to keep track of nested context managers
+    _stack: list['BuildParameters'] = []
+
+    def __init__(self, frozen: bool = True):
+        self._frozen = frozen
+        self._is_building = False
 
     def __enter__(self):
-        """Captures the initial state of local variables when the block starts."""
-        self._caller_frame = inspect.currentframe().f_back
-        self._initial_locals_keys = set(self._caller_frame.f_locals.keys())
+        """Unlocks the instance and pushes it onto the context stack."""
+        self._is_building = True
+        BuildParameters._stack.append(self)
         return self
 
-    def __getattr__(self, name: str) -> Any:
-        """
-        Dynamically looks up variables in the caller's scope. This allows
-        nested contexts to access values from outer contexts in real-time.
-        """
-        if self._caller_frame and name in self._caller_frame.f_locals:
-            return self._caller_frame.f_locals[name]
-        raise AttributeError(f"'{type(self).__name__}' object has no attribute '{name}'")
-
     def __exit__(self, exc_type, exc_val, exc_tb):
-        """
-        Captures new variables from the scope and attaches them as attributes
-        to this instance.
-        """
+        """Locks the instance, pops it from the stack, and auto-attaches to parent."""
+        BuildParameters._stack.pop()
+        self._is_building = False
+
         if exc_type is not None:
-            return False  # Propagate any exceptions
+            return False
 
-        final_locals = self._caller_frame.f_locals
-        new_keys = set(final_locals.keys()) - self._initial_locals_keys
-        
-        # Filter out other context manager instances
-        fields = {
-            key: final_locals[key]
-            for key in new_keys
-            if not isinstance(final_locals[key], BuildParameters)
-        }
+        if BuildParameters._stack:
+            parent = BuildParameters._stack[-1]
+            
+            caller_frame = inspect.currentframe().f_back
+            try:
+                caller_locals = caller_frame.f_locals
+                my_name = next(
+                    (name for name, val in caller_locals.items() if val is self), 
+                    None
+                )
+                
+                if my_name:
+                    setattr(parent, my_name, self)
+            finally:
+                del caller_frame 
 
-        # *** KEY CHANGE ***
-        # Directly update the instance's dictionary with the captured fields.
-        self.__dict__.update(fields)
-
-        # Clean up the frame reference to prevent reference cycles
-        self._caller_frame = None
         return False
 
+    def __setattr__(self, name: str, value: Any) -> None:
+        """Enforces the frozen state after the context manager exits."""
+        if getattr(self, '_frozen', False) and not getattr(self, '_is_building', True):
+            if not name.startswith('_'):
+                raise AttributeError(f"Cannot assign to '{name}': {self.__class__.__name__} is frozen.")
+        
+        super().__setattr__(name, value)
+
     def __repr__(self) -> str:
-        """Provides a clean, dataclass-like representation of the object."""
-        # Exclude internal attributes (those starting with '_') from the output
         core_attrs = {k: v for k, v in self.__dict__.items() if not k.startswith('_')}
         if not core_attrs:
-            return f"<{self.__class__.__name__} (active)>"
+            return f"<{self.__class__.__name__} (empty/active)>"
         
         attrs_str = ', '.join(f"{k}={v!r}" for k, v in core_attrs.items())
         return f"{self.__class__.__name__}({attrs_str})"
