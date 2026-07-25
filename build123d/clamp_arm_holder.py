@@ -10,7 +10,7 @@ set_defaults(ortho=True, default_edgecolor="#121212")
 
 # TODO: add parameterization, add splits and alignment pin holes, cross check dimensions against other parts
 
-with BuildPart() as p:
+with BuildPart() as p_clamp_arm_holder:
     with BuildSketch() as s:
         Rectangle(100, 80, align=(Align.MIN, Align.CENTER))
         with Locations((10, 0)):
@@ -30,24 +30,13 @@ with BuildPart() as p:
         with Locations((35, 0)):
             Hole(15 / 2)
 
-# print(f"\npart mass = {p.part.volume*densa}")
-classes = (BuildPart, BuildSketch, BuildLine)  # for OCP-vscode
-set_colormap(ColorMap.seeded(colormap="rgb", alpha=1, seed_value="vscod"))
-variables, s_o, s_n, slocal = (list(cf().f_locals.items()), [], [], False)
-for name, obj in variables:
-    if (
-        isinstance(obj, classes)
-        and not name.startswith("_")
-        and not name.startswith("obj")
-        and not obj._obj is None
-    ):
-        if obj._obj_name != "sketch" or slocal:
-            s_o.append(obj), s_n.append(f"{name}.{obj._obj_name}")
-        elif obj._obj_name == "sketch":
-            s_o.append(obj.sketch), s_n.append(f"{name}.{obj._obj_name}")
-show(
-    *s_o,
-    edgs,
-    names=s_n,
-    reset_camera=Camera.KEEP,
-)
+
+set_colormap(ColorMap.golden_ratio())
+# fmt: off
+show_all(
+    classes = [BuildPart, BuildSketch, BuildLine, ],  # comment to show all objects
+    include = ["", ],
+    exclude = ["", ],
+    show_locals = False,
+    helper_scale = 1,  # controls size of e.g. planes and axes
+)  # fmt: on

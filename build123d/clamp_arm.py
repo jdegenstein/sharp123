@@ -100,20 +100,20 @@ with BuildPart() as p_clamp:
         Circle(hole_r)
     extrude(amount=clamp_th, mode=Mode.SUBTRACT)
 
-with Locations(Plane.XY):
-    locs = GridLocations(1, 1, 1, 1)
-    for l in locs:
-        print(l)
+# with Locations(Plane.XY):
+    # locs = GridLocations(1, 1, 1, 1)
+    # for l in locs:
+        # print(l)
 
-RigidJoint('left',to_part=p_clamp, joint_location=hole_out.location)
+# RigidJoint('left',to_part=p_clamp, joint_location=hole_out.location)
 
-show(
-    [
-        p_clamp,
-    #   p_clamp.joints['left'],
-#        s_clamp1,
-#        *helpers,
-    ]
-)
+# show(
+    # [
+        # p_clamp,
+      # p_clamp.joints['left'],
+       # s_clamp1,
+       # *helpers,
+    # ]
+# )
 
 # %%
