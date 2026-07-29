@@ -17,6 +17,10 @@ eggs/
 lib/
 lib64/
 parts/
+
+#negate specific parts subfolder
+!src/sharp123/parts/
+
 sdist/
 var/
 wheels/
