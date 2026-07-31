@@ -2,42 +2,39 @@
 # project_dimensions.py
 from sharp123 import BuildParameters
 
+
 def create_assembly_config(
-    pcb_len: float = 100.0,
-    pcb_wid: float = 80.0,
-    wall_thick: float = 3.0,
+    # pcb_len: float = 100.0, # TODO: consider adding inputs, if necessary
 ) -> BuildParameters:
     """Generates a frozen BuildParameters tree with nested sub-namespaces."""
     with BuildParameters() as par:
-        par.clearance = 0.5
-        par.wall_thickness = wall_thick
-        par.fastener_diameter = 3.0  # M3 standard
+        par.clearance = 0.2  # default clearance value
 
-        # Sub-context: PCB
-        with BuildParameters() as pcb:
-            pcb.length = pcb_len
-            pcb.width = pcb_wid
+        # Sub-context: base plate, the only fixed object
+        with BuildParameters() as base_plate:
+            base_plate.cutout_len = 65
+            base_plate.trap_width = 100
+            base_plate.trap_height = 10
+            base_plate.trap_angle = 45
 
-        # Sub-context: Base Enclosure Box
-        with BuildParameters() as box:
-            box.internal_length = par.pcb.length + (2 * par.clearance)
-            box.internal_width = par.pcb.width + (2 * par.clearance)
-            box.outer_length = box.internal_length + (2 * par.wall_thickness)
-            box.outer_width = box.internal_width + (2 * par.wall_thickness)
-            box.height = 25.0
+        # Sub-context: main tower
+        with BuildParameters() as tower:
+            tower.trap_width = 100 - par.clearance
+            tower.trap_height = 10 + par.clearance
+            tower.trap_angle = 45
+            tower.octagon_dia = 50
 
-        # Sub-context: Lid
-        with BuildParameters() as lid:
-            lid.thickness = 4.0
-            lid.lip_height = 2.0
+        # Sub-context: clamp arm holder
+        with BuildParameters() as clamp_arm_holder:
+            clamp_arm_holder.octagon_dia = tower.octagon_dia - par.clearance
+            clamp_arm_holder.pin_dia = 8
 
-        # Sub-context: Hardware
-        with BuildParameters() as hardware:
-            hardware.clearance_hole_radius = (par.fastener_diameter / 2) + 0.15
-            hardware.standoff_height = 6.0
-            hardware.standoff_radius = 3.5
+        # Sub-context: small parts
+        with BuildParameters() as small_parts:
+            small_parts.pin_chamfer = 1
 
     return par
+
 
 if __name__ == "__main__":
     par = create_assembly_config()

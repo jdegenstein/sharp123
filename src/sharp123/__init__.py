@@ -1,7 +1,17 @@
 from .build_parameters import BuildParameters
 from .debug import DebugMixin
 from .project_dimensions import create_assembly_config
-from .parts import Tower, BasePlate
+from .parts import (
+    Tower,
+    BasePlate,
+    ClampArmHolder,
+    ClampingScrew,
+    TaperedClampingNut,
+    LongPin,
+    PlateHandleShaft,
+    Washer,
+    ClampArm,
+)
 
 __all__ = [
     "BuildParameters",
@@ -9,6 +19,13 @@ __all__ = [
     "create_assembly_config",
     "Tower",
     "BasePlate",
-    #TODO: add parts
-    #TODO: add assembly?
+    "ClampArmHolder",
+    "ClampingScrew",
+    "TaperedClampingNut",
+    "LongPin",
+    "PlateHandleShaft",
+    "Washer",
+    "ClampArm",
+    # TODO: add parts
+    # TODO: add assembly?
 ]

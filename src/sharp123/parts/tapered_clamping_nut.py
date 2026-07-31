@@ -1,53 +1,70 @@
 # %%
 from build123d import *
 from ocp_vscode import *
-from inspect import currentframe as cf
 
-set_port(3939)
 show_clear()
 set_defaults(ortho=True, default_edgecolor="#121212")
 # %%
-
-
 from bd_warehouse import thread
-
-mtt = thread.MetricTrapezoidalThread("14x3", 20, external=False)
-
-# TODO: parameterize and validate sizes
-
-with BuildPart() as p_tapered_clamping_nut:
-    with BuildSketch() as s:
-        SlotCenterPoint((0, 0), (10, 0), 25)
-    extrude(amount=20, taper=5)
-    split(bisect_by=Plane.YZ)
-    with Locations((10, 0)):
-        Hole(14 / 2)
-
-mtt = Pos(10, 0) * mtt
-
-assy_tapered_clamping_nut = Compound()
-assy_tapered_clamping_nut.children = [p_tapered_clamping_nut.part, mtt]
+from sharp123 import BuildParameters, DebugMixin
 
 
-# print(f"\npart mass = {p.part.volume*densa}")
-classes = (BuildPart, BuildSketch, BuildLine)  # for OCP-vscode
-set_colormap(ColorMap.seeded(colormap="rgb", alpha=1, seed_value="vscod"))
-variables, s_o, s_n, slocal = (list(cf().f_locals.items()), [], [], False)
-for name, obj in variables:
-    if (
-        isinstance(obj, classes)
-        and not name.startswith("_")
-        and not name.startswith("obj")
-        and not obj._obj is None
+# TODO: check parameterization against other parts, especially taper angle
+class TaperedClampingNut(BasePartObject, DebugMixin):
+    def __init__(
+        self,
+        par: BuildParameters,
+        debug: bool = False,
+        rotation: RotationLike = Rotation(0, 0, 0),
+        align: tuple[Align, Align, Align] = (Align.CENTER, Align.CENTER, Align.CENTER),
+        mode: Mode = Mode.ADD,
     ):
-        if obj._obj_name != "sketch" or slocal:
-            s_o.append(obj), s_n.append(f"{name}.{obj._obj_name}")
-        elif obj._obj_name == "sketch":
-            s_o.append(obj.sketch), s_n.append(f"{name}.{obj._obj_name}")
-show(
-    *s_o,
-    mtt,
-    assy_tapered_clamping_nut,
-    names=s_n,
-    reset_camera=Camera.KEEP,
-)
+        with BuildPart() as p_tapered_clamping_nut:
+            with BuildSketch() as s:
+                SlotCenterPoint((0, 0), (10, 0), 18)
+            extrude(amount=20)
+            split(bisect_by=Plane.YZ)
+
+            with BuildSketch(Plane.YZ) as s2:
+                Trapezoid(18, 20, 85, align=(Align.CENTER, Align.MIN))
+            extrude(amount=-7)
+
+            hole_loc = Location((10, 0))
+            with Locations(hole_loc):
+                Hole(14 / 2)
+
+        mtt = thread.MetricTrapezoidalThread("14x3", 20, external=False)
+        mtt = Pos(10, 0) * mtt
+
+        # explode solids into compound to work around possible joint bug in bd_warehouse or build123d
+        assy_tapered_clamping_nut = Compound(
+            [
+                p_tapered_clamping_nut.part,
+                *mtt.solids(),
+            ]
+        )
+
+        RigidJoint(  # to clamp arm holder
+            label="j1",
+            to_part=assy_tapered_clamping_nut,
+            joint_location=Location(hole_loc),
+        )
+
+        super().__init__(
+            part=assy_tapered_clamping_nut, rotation=rotation, align=align, mode=mode
+        )
+
+        # 2. Capture all local variables from this __init__ frame
+        self.capture_debug_locals()
+
+        # 3. Optionally show immediately if debug flag was passed
+        if debug:
+            self.show_debug()
+
+
+if __name__ == "__main__":
+    from sharp123 import create_assembly_config
+
+    par = create_assembly_config()
+    tapered_clamping_nut = TaperedClampingNut(par)
+    tapered_clamping_nut.show_debug(render_joints=True)
