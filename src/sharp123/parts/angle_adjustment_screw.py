@@ -1,75 +1,90 @@
 # %%
 from build123d import *
 from ocp_vscode import *
-from inspect import currentframe as cf
 
-set_port(3939)
 show_clear()
 set_defaults(ortho=True, default_edgecolor="#121212")
 # %%
-
 from bd_warehouse import thread
-
-mtt_extern = thread.MetricTrapezoidalThread("14x3", 100, external=True)
-
-# TODO: add parameterization
-
-with BuildPart() as p_angle_screw:
-    with BuildSketch() as s:
-        Circle(11 / 2)
-    extrude(amount=100)
-    with BuildSketch() as s:
-        Circle(9 / 2)
-    extrude(amount=-5)
-    with BuildSketch(faces().sort_by(Axis.Z)[-1]) as s:
-        Circle(9 / 2)
-    extrude(amount=10)
-    topfe = faces().sort_by(Axis.Z)[-1].edges()
-    chamfer(topfe, 1)
-    with BuildSketch(faces().sort_by(Axis.Z)[0]) as s:
-        Circle(13 / 2)
-    extrude(amount=2)
-    with BuildSketch(faces().sort_by(Axis.Z)[0]) as s:
-        Circle(20 / 2)
-    extrude(amount=3)
-    botf0 = faces().sort_by(Axis.Z)[0].edges()
-    with BuildSketch(faces().sort_by(Axis.Z)[0]) as s_knob:
-        RegularPolygon(40 / 2, 6)
-        with Locations((vertices())):
-            Circle(5, mode=Mode.SUBTRACT)
-        fillet(vertices(), 1)
-    extrude(amount=15)
-    botf = faces().sort_by(Axis.Z)[0].edges()
-    midf = faces().filter_by(Axis.Z).sort_by(Axis.Z)[1].outer_wire().edges()
-    chamfer(botf, 1)
-    chamfer(midf, 0.99)
-    fillet(botf0, 2.5)
-
-assy_angle_screw = Compound()
-assy_angle_screw.children = [p_angle_screw.part, mtt_extern]
+from sharp123 import BuildParameters, DebugMixin
 
 
-# print(f"\npart mass = {p.part.volume*densa}")
-classes = (BuildPart, BuildSketch, BuildLine)  # for OCP-vscode
-set_colormap(ColorMap.seeded(colormap="rgb", alpha=1, seed_value="vscod"))
-variables, s_o, s_n, slocal = (list(cf().f_locals.items()), [], [], False)
-for name, obj in variables:
-    if (
-        isinstance(obj, classes)
-        and not name.startswith("_")
-        and not name.startswith("obj")
-        and not obj._obj is None
+class AngleAdjustmentScrew(BasePartObject, DebugMixin):
+    def __init__(
+        self,
+        par: BuildParameters,
+        debug: bool = False,
+        rotation: RotationLike = Rotation(0, 0, 0),
+        align: tuple[Align, Align, Align] = (Align.CENTER, Align.CENTER, Align.CENTER),
+        mode: Mode = Mode.ADD,
     ):
-        if obj._obj_name != "sketch" or slocal:
-            s_o.append(obj), s_n.append(f"{name}.{obj._obj_name}")
-        elif obj._obj_name == "sketch":
-            s_o.append(obj.sketch), s_n.append(f"{name}.{obj._obj_name}")
-show(
-    *s_o,
-    mtt_extern,
-    botf0,
-    midf,
-    assy_angle_screw,
-    names=s_n,
-    reset_camera=Camera.KEEP,
-)
+        threaded_length = par.angle_screw.captured_length - 5 - 3.5 * 2 - 10
+        with BuildPart() as p_angle_screw:
+            with BuildSketch() as s:
+                Circle(11 / 2)
+            extrude(amount=threaded_length)
+            with BuildSketch() as s:
+                Circle(14.5 / 2)
+            extrude(amount=-3.5)
+            with BuildSketch(faces().sort_by(Axis.Z)[0]) as s:
+                Circle(9 / 2)
+            extrude(amount=5)
+            with BuildSketch(faces().sort_by(Axis.Z)[0]) as s:
+                Circle(14.5 / 2)
+            extrude(amount=3.5)
+            with BuildSketch(faces().sort_by(Axis.Z)[-1]) as s:
+                Circle(9 / 2)
+            extrude(amount=10)
+            topfe = faces().sort_by(Axis.Z)[-1].edges()
+            chamfer(topfe, 1)
+            with BuildSketch(faces().sort_by(Axis.Z)[0]) as s:
+                Circle(20 / 2)
+            extrude(amount=3)
+            botf0 = faces().sort_by(Axis.Z)[0].edges()
+            with BuildSketch(faces().sort_by(Axis.Z)[0]) as s_knob:
+                RegularPolygon(40 / 2, 6)
+                with Locations((vertices())):
+                    Circle(5, mode=Mode.SUBTRACT)
+                fillet(vertices(), 1)
+            extrude(amount=15)
+            botf = faces().sort_by(Axis.Z)[0].edges()
+            midf = faces().filter_by(Axis.Z).sort_by(Axis.Z)[1].outer_wire().edges()
+            chamfer(botf, 1)
+            chamfer(midf, 0.99)
+            fillet(botf0, 2.5)
+        mtt_extern = thread.MetricTrapezoidalThread(
+            "14x3", threaded_length, external=True
+        )
+
+        assy_angle_screw = Compound([p_angle_screw.part, *mtt_extern.solids()])
+
+        RigidJoint(  # to main tower
+            "j1",
+            to_part=assy_angle_screw,
+            joint_location=Location(Plane((0, 0, -12), z_dir=(0, 0, -1))),
+        )
+        RigidJoint(  # to angle adjustment nut
+            "j2",
+            to_part=assy_angle_screw,
+            joint_location=Location(
+                Plane((0, 0, 32), x_dir=(0, -1, 0), z_dir=(0, 0, -1))
+            ),
+        )
+        super().__init__(
+            part=assy_angle_screw, rotation=rotation, align=align, mode=mode
+        )
+
+        # 2. Capture all local variables from this __init__ frame
+        self.capture_debug_locals()
+
+        # 3. Optionally show immediately if debug flag was passed
+        if debug:
+            self.show_debug()
+
+
+if __name__ == "__main__":
+    from sharp123 import create_assembly_config
+
+    par = create_assembly_config()
+    angle_adjustment_screw = AngleAdjustmentScrew(par)
+    angle_adjustment_screw.show_debug(render_joints=True)

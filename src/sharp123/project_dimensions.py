@@ -33,6 +33,10 @@ def create_assembly_config(
         with BuildParameters() as small_parts:
             small_parts.pin_chamfer = 1
 
+        # Sub-context: main tower
+        with BuildParameters() as angle_screw:
+            angle_screw.captured_length = 86
+
     return par
 
 

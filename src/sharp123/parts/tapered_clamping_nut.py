@@ -26,8 +26,8 @@ class TaperedClampingNut(BasePartObject, DebugMixin):
             split(bisect_by=Plane.YZ)
 
             with BuildSketch(Plane.YZ) as s2:
-                Trapezoid(18, 20, 85, align=(Align.CENTER, Align.MIN))
-            extrude(amount=-7)
+                Trapezoid(33, 20, 85, align=(Align.CENTER, Align.MIN))
+            extrude(amount=-9)
 
             hole_loc = Location((10, 0))
             with Locations(hole_loc):

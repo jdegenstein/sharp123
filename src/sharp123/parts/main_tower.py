@@ -29,7 +29,7 @@ class Tower(BasePartObject, DebugMixin):
                 split(bisect_by=Plane.XZ)
                 offset(amount=-12)
             extrude(amount=par.base_plate.cutout_len / 2, both=True, mode=Mode.SUBTRACT)
-            with BuildSketch() as s:
+            with BuildSketch() as s3:
                 RegularPolygon(
                     par.tower.octagon_dia / 2,
                     8,
@@ -41,7 +41,7 @@ class Tower(BasePartObject, DebugMixin):
                 vertices().group_by(Axis.Y)[-1].group_by(Axis.X)[-1].sort_by(Axis.Z)[-1]
             )
             vtxt = (vtx.X, vtx.Y, 0)
-            with BuildSketch() as s:
+            with BuildSketch() as s4:
                 with BuildLine() as l:
                     m1 = PolarLine(
                         (par.tower.trap_width / 2, tower_ht / 2),
@@ -55,6 +55,21 @@ class Tower(BasePartObject, DebugMixin):
                 mirror(about=Plane.YZ)
             extrude(amount=par.base_plate.cutout_len / 2, both=True, mode=Mode.SUBTRACT)
 
+            with BuildSketch(Plane.XZ.offset(12)):
+                with Locations((37.9 - 18, 0)):
+                    Circle(9.5 / 2)
+            extrude(amount=-10, mode=Mode.SUBTRACT)
+
+            with BuildSketch(Plane.XZ.offset(12)):
+                with Locations((37.9 - 18, 0)):
+                    Circle(15 / 2)
+            extrude(amount=200, mode=Mode.SUBTRACT)
+
+            with BuildSketch() as s:
+                with Locations((19.9 - 4.5, -84)):
+                    Rectangle(10, 4.5, align=(Align.MAX, Align.CENTER))
+            extrude(amount=100, both=True, mode=Mode.SUBTRACT)
+
             sel = faces().sort_by(Axis.Z)[-1].edges().sort_by(Axis.Y)[-1]
 
             RigidJoint(  # to base plate
@@ -62,11 +77,31 @@ class Tower(BasePartObject, DebugMixin):
                 joint_location=Location(Plane(sel @ 0.5, (-1, 0, 0), (0, 0, 1))),
             )
 
-            sel2 = faces().sort_by(Axis.Z)[0].inner_wires().sort_by(SortBy.LENGTH)[0]
+            sel2 = faces().sort_by(Axis.Z)[0].inner_wires().sort_by(SortBy.LENGTH)[1]
             sel2c = Face(sel2).center()
             RigidJoint(  # to clamp arm holder
                 label="j2",
                 joint_location=Location(Plane(sel2c, (1, 0, 0), (0, 0, 1))),
+            )
+
+            sel3 = (
+                edges()
+                .filter_by(GeomType.CIRCLE)
+                .filter_by(lambda e: e.radius == 15 / 2)
+                .sort_by(Axis.Y)[0]
+                .arc_center
+            )
+            RigidJoint(  # to angle adjustment screw
+                label="j3",
+                joint_location=Location(Plane(sel3, (-1, 0, 0), (0, -1, 0))),
+            )
+
+            sel4 = faces().sort_by(Axis.Z)[0].inner_wires().sort_by(SortBy.LENGTH)[0]
+            sel4c = Face(sel4).center()
+
+            RigidJoint(  # to angle adjustment (aa) screw key
+                label="j4",
+                joint_location=Location(Plane(sel4c)),
             )
 
         super().__init__(part=p_tower.part, rotation=rotation, align=align, mode=mode)

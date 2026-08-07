@@ -16,22 +16,21 @@ class ClampingScrew(BasePartObject, DebugMixin):
         par: BuildParameters,
         debug: bool = False,
         rotation: RotationLike = Rotation(0, 0, 0),
-        align: tuple[Align, Align, Align] = (Align.CENTER, Align.CENTER, Align.CENTER),
+        align: tuple[Align, Align, Align] = Align.NONE,
         mode: Mode = Mode.ADD,
     ):
-        mtt_extern = thread.MetricTrapezoidalThread(
-            "14x3", par.tower.trap_width, external=True
-        )
+        thread_len = par.tower.trap_width - 20
+        mtt_extern = thread.MetricTrapezoidalThread("14x3", thread_len, external=True)
         with BuildPart() as p_angle_screw:
             with BuildSketch() as s:
                 Circle(11 / 2)
-            extrude(amount=par.tower.trap_width)
+            extrude(amount=thread_len)
             with BuildSketch() as s2:
                 Circle(14 / 2)
-            extrude(amount=-7)
+            extrude(amount=-10)
             with BuildSketch(faces().sort_by(Axis.Z)[-1]) as s3:
-                Circle(9 / 2)
-            extrude(amount=7)
+                Circle(11 / 2)
+            extrude(amount=10 + 4.1)
             topfe = faces().sort_by(Axis.Z)[-1].edges()
             chamfer(topfe, 1)
             with BuildSketch(faces().sort_by(Axis.Z)[0]) as s4:
@@ -63,7 +62,13 @@ class ClampingScrew(BasePartObject, DebugMixin):
         RigidJoint(  # to tapered clamping nut
             label="j2",
             to_part=assy_angle_screw,
-            joint_location=Location(Plane((0, 0, 0), (1, 0, 0), (0, 0, 1))),
+            joint_location=Location(Plane((0, 0, 1.5), (1, 0, 0), (0, 0, 1))),
+        )
+
+        RigidJoint(  # to end washer retaining
+            label="j3",
+            to_part=assy_angle_screw,
+            joint_location=Location(Plane(topfe[0].arc_center, (1, 0, 0), (0, 0, 1))),
         )
 
         super().__init__(

@@ -9,8 +9,14 @@ from .parts import (
     TaperedClampingNut,
     LongPin,
     PlateHandleShaft,
+    PlateHolderHandle,
     Washer,
     ClampArm,
+    AngleAdjustmentScrew,
+    AngleAdjustmentNut,
+    DiamondPlateHolder,
+    AAScrewKey,
+    KnifeExample,
 )
 
 __all__ = [
@@ -24,8 +30,14 @@ __all__ = [
     "TaperedClampingNut",
     "LongPin",
     "PlateHandleShaft",
+    "PlateHolderHandle",
     "Washer",
     "ClampArm",
+    "AngleAdjustmentScrew",
+    "AngleAdjustmentNut",
+    "DiamondPlateHolder",
+    "AAScrewKey",
+    "KnifeExample",
     # TODO: add parts
     # TODO: add assembly?
 ]

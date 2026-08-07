@@ -89,7 +89,7 @@ class PlateHandleShaft(BasePartObject, DebugMixin):
         align: tuple[Align, Align, Align] = (Align.CENTER, Align.CENTER, Align.CENTER),
         mode: Mode = Mode.ADD,
     ):
-        shaft_len = 200
+        shaft_len = 250
         shaft_d = 10
 
         with BuildPart() as p_plate_handle_shaft:
@@ -99,7 +99,10 @@ class PlateHandleShaft(BasePartObject, DebugMixin):
             chamfer(
                 edges(), par.small_parts.pin_chamfer
             )  # TODO: maybe make this end caps only
-            RigidJoint("j1", joint_location=Location())  # to plate holder handle
+            RigidJoint("j1", joint_location=Pos(Z=20))  # to angle adjustment nut
+            RigidJoint(
+                "j2", joint_location=Pos(Z=shaft_len - 20)
+            )  # to plate holder handle, TODO: parameterize
 
         super().__init__(
             part=p_plate_handle_shaft.part, rotation=rotation, align=align, mode=mode
@@ -123,7 +126,7 @@ class Washer(BasePartObject, DebugMixin):
         mode: Mode = Mode.ADD,
     ):
         washer_od = 25
-        washer_id = 8  # bind to clamp screw
+        washer_id = 11.2  # bind to clamp screw
         washer_th = 4
 
         with BuildPart() as p_washer:
@@ -132,9 +135,40 @@ class Washer(BasePartObject, DebugMixin):
                 Circle(washer_id / 2, mode=Mode.SUBTRACT)
             extrude(amount=washer_th)
 
-            RigidJoint("j1", joint_location=Location())  # to clamp screw end
+            RigidJoint("j1", joint_location=Pos(Z=washer_th))  # to clamp screw end
 
         super().__init__(part=p_washer.part, rotation=rotation, align=align, mode=mode)
+
+        # 2. Capture all local variables from this __init__ frame
+        self.capture_debug_locals()
+
+        # 3. Optionally show immediately if debug flag was passed
+        if debug:
+            self.show_debug()
+
+
+class AAScrewKey(BasePartObject, DebugMixin):
+    def __init__(
+        self,
+        par: BuildParameters,
+        debug: bool = False,
+        rotation: RotationLike = Rotation(0, 0, 0),
+        align: tuple[Align, Align, Align] = Align.NONE,
+        mode: Mode = Mode.ADD,
+    ):
+        with BuildPart() as p_aa_screw_key:
+            with BuildSketch() as s:
+                Rectangle(10 - par.clearance, 4.5 - par.clearance)
+            extrude(amount=65)
+
+            RigidJoint(
+                "j1",
+                joint_location=Location(),
+            )
+
+        super().__init__(
+            part=p_aa_screw_key.part, rotation=rotation, align=align, mode=mode
+        )
 
         # 2. Capture all local variables from this __init__ frame
         self.capture_debug_locals()
@@ -162,3 +196,6 @@ if __name__ == "__main__":
 
     washer = Washer(par)
     washer.show_debug(render_joints=True)
+
+    aa_screw_key = AAScrewKey(par)
+    aa_screw_key.show_debug(render_joints=True)

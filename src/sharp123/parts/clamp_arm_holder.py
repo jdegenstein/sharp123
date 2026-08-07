@@ -16,7 +16,7 @@ class ClampArmHolder(BasePartObject, DebugMixin):
         par: BuildParameters,
         debug: bool = False,
         rotation: RotationLike = Rotation(0, 0, 0),
-        align: tuple[Align, Align, Align] = (Align.CENTER, Align.CENTER, Align.CENTER),
+        align: tuple[Align, Align, Align] = Align.NONE,
         mode: Mode = Mode.ADD,
     ):
         with BuildPart() as p_clamp_arm_holder:
@@ -41,13 +41,24 @@ class ClampArmHolder(BasePartObject, DebugMixin):
             extrude(amount=-par.base_plate.cutout_len)
 
             edgs = faces().group_by(Axis.X)[-1].edges().filter_by(Axis.Y)
-            chamfer(edgs, 40, 20)
+            chamfer(edgs, 40, 15)
 
+            sel0 = (
+                faces()
+                .sort_by(Axis.Y)[-1]
+                .edges()
+                .filter_by(Axis.Z)
+                .sort_by(Axis.X)[-1]
+            )
+            pln = Plane(sel0 @ 0.5, (1, 0, 0), (0, 1, 0))
+            with BuildSketch(pln) as s3:
+                Rectangle(18 / 1.414, 18 / 1.414, rotation=45)
+            extrude(amount=-100, mode=Mode.SUBTRACT)
             with Locations(Plane.XZ.offset(0)):
-                with Locations((60, 10), (60, -10)):
+                with Locations((60, 15), (60, -15)):
                     Hole(8 / 2)
                 with Locations((31, 0)):
-                    Hole(15 / 2)
+                    Hole(11.5 / 2)
             sel = faces().sort_by(Axis.X)[0].center()
             RigidJoint(  # to main tower
                 label="j1",
@@ -86,6 +97,11 @@ class ClampArmHolder(BasePartObject, DebugMixin):
                     Plane(sel3.sort_by(Axis.Z)[-1].arc_center, (1, 0, 0), (0, 1, 0))
                 ),
             )
+            RigidJoint(  # to example knife
+                label="j5",
+                joint_location=Location(Plane((90.999, 49.9, 0), (1, 0, 0), (0, 0, 1))),
+            )
+
         super().__init__(
             part=p_clamp_arm_holder.part, rotation=rotation, align=align, mode=mode
         )

@@ -36,7 +36,7 @@ class ClampArm(BasePartObject, DebugMixin):
                     )
                     m2 = Line(m1 @ 1, m1 @ 0)
                 make_face()
-            extrude(amount=par.tower.trap_width - 20)
+            extrude(amount=par.tower.trap_width - 21)
 
             with BuildSketch(Plane.YZ) as s2:
                 with BuildLine() as l2:
@@ -51,7 +51,7 @@ class ClampArm(BasePartObject, DebugMixin):
                 make_face()
             extrude(amount=8)
 
-            hole_loc = Location((48, -10, (par.tower.trap_width - 20) / 2))
+            hole_loc = Location((48, -10, (par.tower.trap_width - 21) / 2))
             with Locations(hole_loc):
                 Hole(8 / 2)
 
