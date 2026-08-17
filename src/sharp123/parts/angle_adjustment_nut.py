@@ -6,7 +6,7 @@ show_clear()
 set_defaults(ortho=True, default_edgecolor="#121212")
 # %%
 from bd_warehouse import thread
-from sharp123 import BuildParameters, DebugMixin
+from sharp123 import BuildParameters, DebugMixin, PrintableMetricTrapezoidalThread
 
 
 class AngleAdjustmentNut(BasePartObject, DebugMixin):
@@ -22,7 +22,7 @@ class AngleAdjustmentNut(BasePartObject, DebugMixin):
             with BuildSketch() as s:
                 with Locations((0, 10)):
                     Trapezoid(40, 27.5, 65, align=(Align.CENTER, Align.MAX))
-                Circle(14 / 2, mode=Mode.SUBTRACT)
+                Circle(14.6 / 2, mode=Mode.SUBTRACT)
             extrude(amount=18)
             with BuildSketch(faces().sort_by(Axis.Y)[-1]) as s:
                 Rectangle(5, 18)
@@ -41,7 +41,7 @@ class AngleAdjustmentNut(BasePartObject, DebugMixin):
             )
             fillet(sel2, 1)
 
-        mtt = thread.MetricTrapezoidalThread("14x3", 18, external=False)
+        mtt = PrintableMetricTrapezoidalThread("14x3", 18, external=False, clearance=0.7)
         assy_angle_nut = Compound([p_angle_adjustment_nut.part, *mtt.solids()])
 
         RigidJoint(  # to angle adjustment screw

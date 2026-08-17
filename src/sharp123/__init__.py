@@ -1,6 +1,7 @@
 from .build_parameters import BuildParameters
 from .debug import DebugMixin
 from .project_dimensions import create_assembly_config
+from .printable_thread import PrintableMetricTrapezoidalThread
 from .parts import (
     Tower,
     BasePlate,
@@ -23,6 +24,7 @@ __all__ = [
     "BuildParameters",
     "DebugMixin",
     "create_assembly_config",
+    "PrintableMetricTrapezoidalThread",
     "Tower",
     "BasePlate",
     "ClampArmHolder",

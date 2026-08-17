@@ -53,7 +53,7 @@ class AngleAdjustmentScrew(BasePartObject, DebugMixin):
             chamfer(midf, 0.99)
             fillet(botf0, 2.5)
         mtt_extern = thread.MetricTrapezoidalThread(
-            "14x3", threaded_length, external=True
+            "14x3", threaded_length, external=True, end_finishes=("chamfer","chamfer")
         )
 
         assy_angle_screw = Compound([p_angle_screw.part, *mtt_extern.solids()])

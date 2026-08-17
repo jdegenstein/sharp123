@@ -1,91 +1,51 @@
 # %%
+import sys
+
+for key in list(sys.modules.keys()):
+    if key.startswith("sharp123"):
+        del sys.modules[key]
+
 from build123d import *
 from ocp_vscode import *
 
 show_clear()
 set_defaults(ortho=True, default_edgecolor="#121212")
 
-from sharp123 import (
-    create_assembly_config,
-    DebugMixin,
-    Tower,
-    BasePlate,
-    ClampArmHolder,
-    ClampingScrew,
-    TaperedClampingNut,
-    LongPin,
-    PlateHandleShaft,
-    PlateHolderHandle,
-    Washer,
-    ClampArm,
-    AngleAdjustmentScrew,
-    AngleAdjustmentNut,
-    DiamondPlateHolder,
-    AAScrewKey,
-    KnifeExample,
-)
-
-# # %%
+import sharp123.parts as parts
+from sharp123 import create_assembly_config
 
 # packed = pack(
 #     [
-#         p_angle_nut.part,
-#         p_angle_screw.part,
-#         p_base_plate.part,
-#         # p_clamp.part,
-#         p_clamp_arm_holder.part,
-#         p_clamp_screw.part,
-#         p_diamond_plate_holder.part,
-#         p_plate_handle.part,
-#         p_tower.part,
-#         p_short_pin.part,
-#         p_long_pin.part,
-#         p_shaft.part,
-#         p_washer.part,
-#         p_tapered_clamping_nut.part,
+#           ...        
 #     ],
 #     padding=5,
 #     align_z=True,
 # )
 
 if __name__ == "__main__":
-    # TODO: fix this hacky stuff:
-    from IPython import get_ipython
-
-    ipython = get_ipython()
-    if ipython is not None:
-        ipython.run_line_magic("load_ext", "autoreload")
-        ipython.run_line_magic("autoreload", "3")
-    else:
-        print("Not running in an IPython environment.")
-    # %reset -f
-
     par = create_assembly_config()
-    tower = Tower(par)
+    tower = parts.Tower(par)
     # tower.show_debug(render_joints=True)
 
-    base_plate = BasePlate(par)
+    base_plate = parts.BasePlate(par)
     # base_plate.show_debug(render_joints=True)
 
-    clamp_arm_holder = ClampArmHolder(par)
+    clamp_arm_holder = parts.ClampArmHolder(par)
     # clamp_arm_holder.show_debug(render_joints=True)
 
-    clamping_screw = ClampingScrew(par)
+    clamping_screw = parts.ClampingScrew(par)
     # clamping_screw.show_debug(render_joints=True)
 
-    clamping_screw = ClampingScrew(par)
-    # clamping_screw.show_debug(render_joints=True)
-
-    tapered_clamping_nut = TaperedClampingNut(par)
+    tapered_clamping_nut = parts.TaperedClampingNut(par)
     # tapered_clamping_nut.show_debug(render_joints=True)
 
-    long_pin_1 = LongPin(par)
+    long_pin_1 = parts.LongPin(par)
     # long_pin_1.show_debug(render_joints=True)
 
-    long_pin_2 = LongPin(par)
+    long_pin_2 = parts.LongPin(par)
     # long_pin_2.show_debug(render_joints=True)
 
-    clamp_arm = ClampArm(par)
+    clamp_arm = parts.ClampArm(par)
     # clamp_arm.show_debug(render_joints=True)
 
     clamp_arm_mirror = clamp_arm.solid()
@@ -95,28 +55,28 @@ if __name__ == "__main__":
         "j1", to_part=clamp_arm_mirror, joint_location=clamp_arm.joints["j1"].location
     )
 
-    angle_adjustment_screw = AngleAdjustmentScrew(par)
+    angle_adjustment_screw = parts.AngleAdjustmentScrew(par)
     # angle_adjustment_screw.show_debug(render_joints=True)
 
-    angle_adjustment_nut = AngleAdjustmentNut(par)
+    angle_adjustment_nut = parts.AngleAdjustmentNut(par)
     # angle_adjustment_nut.show_debug(render_joints=True)
 
-    plate_handle_shaft = PlateHandleShaft(par)
+    plate_handle_shaft = parts.PlateHandleShaft(par)
     # plate_handle_shaft.show_debug(render_joints=True)
 
-    plate_holder_handle = PlateHolderHandle(par)
+    plate_holder_handle = parts.PlateHolderHandle(par)
     # plate_holder_handle.show_debug(render_joints=True)
 
-    diamond_plate_holder = DiamondPlateHolder(par)
+    diamond_plate_holder = parts.DiamondPlateHolder(par)
     # diamond_plate_holder.show_debug(render_joints=True)
 
-    aa_screw_key = AAScrewKey(par)
+    aa_screw_key = parts.AAScrewKey(par)
     # aa_screw_key.show_debug(render_joints=True)
 
-    washer = Washer(par)
+    washer = parts.Washer(par)
     # washer.show_debug(render_joints=True)
 
-    knife_example = KnifeExample(par)
+    knife_example = parts.KnifeExample(par)
     # knife_example.show_debug(render_joints=True)
 
     ############# ASSEMBLE JOINTS #######################
@@ -179,3 +139,51 @@ if __name__ == "__main__":
     # for solid in clamping_screw.solids():
     # solid.material = plastics.asa(color="chartreuse", process=processes.fdm(mm_per_uv=.5))
     show_all(render_joints=True)
+
+
+# %%
+
+shapes_to_print = {
+    # tower,
+    # base_plate,
+    "clamp_arm_holder":clamp_arm_holder,
+    # clamping_screw,
+    "tapered_clamping_nut":tapered_clamping_nut,
+    "long_pin_1":long_pin_1,
+    "long_pin_2":long_pin_2,
+    "clamp_arm":clamp_arm,
+    "clamp_arm_mirror":clamp_arm_mirror,
+    # angle_adjustment_screw,
+    # angle_adjustment_nut,
+    # plate_handle_shaft,
+    # plate_holder_handle,
+    # diamond_plate_holder,
+    # aa_screw_key,
+    # washer,
+}
+
+
+shapes_to_print = {
+    # tower,
+    # base_plate,
+    # clamping_screw_top,
+    # clamping_screw_bot,
+    "clamping_screw":clamping_screw,
+    "tapered_clamping_nut":tapered_clamping_nut,
+    # angle_adjustment_screw,
+    # angle_adjustment_nut,
+    # plate_handle_shaft,
+    # plate_holder_handle,
+    # diamond_plate_holder,
+    # aa_screw_key,
+    # washer,
+}
+
+
+from pathlib import Path
+for key,shape in shapes_to_print.items():
+    suffix = "v1"
+    filename = Path("..")/Path(f"{key}_{suffix}.step")
+    export_step(shape,filename)
+    filename = Path("..")/Path(f"{key}_{suffix}.stl")
+    export_stl(shape,filename)

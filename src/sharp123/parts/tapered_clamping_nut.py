@@ -6,7 +6,7 @@ show_clear()
 set_defaults(ortho=True, default_edgecolor="#121212")
 # %%
 from bd_warehouse import thread
-from sharp123 import BuildParameters, DebugMixin
+from sharp123 import BuildParameters, DebugMixin, PrintableMetricTrapezoidalThread
 
 
 # TODO: check parameterization against other parts, especially taper angle
@@ -31,9 +31,9 @@ class TaperedClampingNut(BasePartObject, DebugMixin):
 
             hole_loc = Location((10, 0))
             with Locations(hole_loc):
-                Hole(14 / 2)
+                Hole(14.6 / 2)
 
-        mtt = thread.MetricTrapezoidalThread("14x3", 20, external=False)
+        mtt = PrintableMetricTrapezoidalThread("14x3", 20, external=False, clearance=0.7)
         mtt = Pos(10, 0) * mtt
 
         # explode solids into compound to work around possible joint bug in bd_warehouse or build123d

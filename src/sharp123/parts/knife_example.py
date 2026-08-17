@@ -71,7 +71,7 @@ class KnifeExample(BasePartObject, DebugMixin):
         RigidJoint(  # to clamp arm holder
             "j1",
             to_part=comp,
-            joint_location=Location(Plane((0, 0, 0), x_dir=(-1, 0, 0))),
+            joint_location=Location(Plane((0, 0, 0), x_dir=(0,-1, 0))),
         )
 
         super().__init__(part=comp, rotation=rotation, align=align, mode=mode)

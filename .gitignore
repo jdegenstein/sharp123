@@ -167,3 +167,16 @@ cython_debug/
 
 # vscode history plugin
 .history
+
+# User generated debris (3D)
+*.stp
+*.STP
+*.step
+*.STEP
+*.stl
+*.STL
+*.3mf
+*.brep
+*.gltf
+*.bin
+*.glb

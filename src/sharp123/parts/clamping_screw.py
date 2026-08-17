@@ -20,7 +20,7 @@ class ClampingScrew(BasePartObject, DebugMixin):
         mode: Mode = Mode.ADD,
     ):
         thread_len = par.tower.trap_width - 20
-        mtt_extern = thread.MetricTrapezoidalThread("14x3", thread_len, external=True)
+        mtt_extern = thread.MetricTrapezoidalThread("14x3", thread_len, external=True, end_finishes=("chamfer","chamfer"))
         with BuildPart() as p_angle_screw:
             with BuildSketch() as s:
                 Circle(11 / 2)
