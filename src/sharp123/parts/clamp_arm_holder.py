@@ -25,18 +25,18 @@ class ClampArmHolder(BasePartObject, DebugMixin):
                 with Locations((10, 0)):
                     Rectangle(
                         100,
-                        par.tower.trap_width - 20,
+                        par.clamp_arm_holder.interior_width,
                         align=(Align.MIN, Align.CENTER),
                         mode=Mode.SUBTRACT,
                     )
             extrude(amount=par.clamp_arm_holder.octagon_dia / 2, both=True)
-            # TODO^ clamp arm holder is wider than octagon which is ok but not clear from this
 
             with BuildSketch(Plane.YZ.offset(0)) as s2:
                 RegularPolygon(
                     par.clamp_arm_holder.octagon_dia / 2,
                     8,
                     rotation=360 / 8 / 2,
+                    major_radius=False,
                 )
             extrude(amount=-par.base_plate.cutout_len)
 
@@ -56,7 +56,7 @@ class ClampArmHolder(BasePartObject, DebugMixin):
             extrude(amount=-100, mode=Mode.SUBTRACT)
             with Locations(Plane.XZ.offset(0)):
                 with Locations((60, 15), (60, -15)):
-                    Hole(8 / 2)
+                    Hole((par.clamp_arm_holder.pin_dia+0.2)/2) # tight fit
                 with Locations((31, 0)):
                     Hole(11.5 / 2)
             sel = faces().sort_by(Axis.X)[0].center()

@@ -148,7 +148,7 @@ shapes_to_print = {
     # base_plate,
     "clamp_arm_holder":clamp_arm_holder,
     # clamping_screw,
-    "tapered_clamping_nut":tapered_clamping_nut,
+    # "tapered_clamping_nut":tapered_clamping_nut,
     "long_pin_1":long_pin_1,
     "long_pin_2":long_pin_2,
     "clamp_arm":clamp_arm,
@@ -163,21 +163,21 @@ shapes_to_print = {
 }
 
 
-shapes_to_print = {
-    # tower,
-    # base_plate,
-    # clamping_screw_top,
-    # clamping_screw_bot,
-    "clamping_screw":clamping_screw,
-    "tapered_clamping_nut":tapered_clamping_nut,
-    # angle_adjustment_screw,
-    # angle_adjustment_nut,
-    # plate_handle_shaft,
-    # plate_holder_handle,
-    # diamond_plate_holder,
-    # aa_screw_key,
-    # washer,
-}
+# shapes_to_print = {
+#     # tower,
+#     # base_plate,
+#     # clamping_screw_top,
+#     # clamping_screw_bot,
+#     "clamping_screw":clamping_screw,
+#     "tapered_clamping_nut":tapered_clamping_nut,
+#     # angle_adjustment_screw,
+#     # angle_adjustment_nut,
+#     # plate_handle_shaft,
+#     # plate_holder_handle,
+#     # diamond_plate_holder,
+#     # aa_screw_key,
+#     # washer,
+# }
 
 
 from pathlib import Path

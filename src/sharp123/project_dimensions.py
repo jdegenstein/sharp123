@@ -8,7 +8,7 @@ def create_assembly_config(
 ) -> BuildParameters:
     """Generates a frozen BuildParameters tree with nested sub-namespaces."""
     with BuildParameters() as par:
-        par.clearance = 0.2  # default clearance value
+        par.clearance = 0.3  # default clearance value
 
         # Sub-context: base plate, the only fixed object
         with BuildParameters() as base_plate:
@@ -26,8 +26,10 @@ def create_assembly_config(
 
         # Sub-context: clamp arm holder
         with BuildParameters() as clamp_arm_holder:
-            clamp_arm_holder.octagon_dia = tower.octagon_dia - par.clearance
+            clamp_arm_holder.interior_width = tower.trap_width - 20
+            clamp_arm_holder.octagon_dia = tower.octagon_dia - 3*par.clearance # loose fit
             clamp_arm_holder.pin_dia = 8
+            clamp_arm_holder.pin_dia_hole = clamp_arm_holder.pin_dia + 0.6
 
         # Sub-context: small parts
         with BuildParameters() as small_parts:

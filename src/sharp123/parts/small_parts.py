@@ -7,7 +7,6 @@ set_defaults(ortho=True, default_edgecolor="#121212")
 # %%
 from sharp123 import BuildParameters, DebugMixin
 
-# TODO: add rectangular shaft retainer that will be used to retain angle adjustment screw
 
 
 # short pin is NOT actually used in the current version
@@ -54,8 +53,8 @@ class LongPin(BasePartObject, DebugMixin):
         long_pin_len = par.tower.trap_width
         long_pin_d = (
             par.clamp_arm_holder.pin_dia
-        )  # TODO: bind to parameters driven by clamp arm holder
-
+        )
+        
         with BuildPart() as p_long_pin:
             with BuildSketch() as s_long_pin:
                 Circle(long_pin_d / 2)  # circular or regular polygon?

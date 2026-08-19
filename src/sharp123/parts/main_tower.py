@@ -35,6 +35,7 @@ class Tower(BasePartObject, DebugMixin):
                     8,
                     rotation=360 / 8 / 2,
                     align=(Align.CENTER, Align.MIN),
+                    major_radius=False,
                 )
             extrude(amount=par.base_plate.cutout_len / 2, both=True, mode=Mode.SUBTRACT)
             vtx = (

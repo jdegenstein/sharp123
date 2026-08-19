@@ -17,6 +17,8 @@ class ClampArm(BasePartObject, DebugMixin):
         align: tuple[Align, Align, Align] = (Align.CENTER, Align.CENTER, Align.CENTER),
         mode: Mode = Mode.ADD,
     ):
+
+        overall_height = par.clamp_arm_holder.interior_width - 1
         with BuildPart() as p_clamp_arm:
             with BuildSketch() as s:
                 with BuildLine() as l:
@@ -36,13 +38,13 @@ class ClampArm(BasePartObject, DebugMixin):
                     )
                     m2 = Line(m1 @ 1, m1 @ 0)
                 make_face()
-            extrude(amount=par.tower.trap_width - 21)
+            extrude(amount=overall_height)
 
             with BuildSketch(Plane.YZ) as s2:
                 with BuildLine() as l2:
                     n1 = PolarLine(
                         (-10, 0),
-                        par.tower.trap_width - 20,
+                        overall_height,
                         90 + 5,
                         length_mode=LengthMode.VERTICAL,
                     )
@@ -51,9 +53,9 @@ class ClampArm(BasePartObject, DebugMixin):
                 make_face()
             extrude(amount=8)
 
-            hole_loc = Location((48, -10, (par.tower.trap_width - 21) / 2))
+            hole_loc = Location((48, -10, (overall_height) / 2))
             with Locations(hole_loc):
-                Hole(8 / 2)
+                Hole(par.clamp_arm_holder.pin_dia_hole/2)
 
             RigidJoint(
                 "j1",
