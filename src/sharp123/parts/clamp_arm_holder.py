@@ -58,7 +58,7 @@ class ClampArmHolder(BasePartObject, DebugMixin):
                 with Locations((60, 15), (60, -15)):
                     Hole((par.clamp_arm_holder.pin_dia+0.2)/2) # tight fit
                 with Locations((31, 0)):
-                    Hole(11.5 / 2)
+                    CounterBoreHole(11.5/2,15/2,0)
             sel = faces().sort_by(Axis.X)[0].center()
             RigidJoint(  # to main tower
                 label="j1",

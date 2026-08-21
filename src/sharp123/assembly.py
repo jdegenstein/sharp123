@@ -149,10 +149,10 @@ shapes_to_print = {
     "clamp_arm_holder":clamp_arm_holder,
     # clamping_screw,
     # "tapered_clamping_nut":tapered_clamping_nut,
-    "long_pin_1":long_pin_1,
-    "long_pin_2":long_pin_2,
-    "clamp_arm":clamp_arm,
-    "clamp_arm_mirror":clamp_arm_mirror,
+    # "long_pin_1":long_pin_1,
+    # "long_pin_2":long_pin_2,
+    # "clamp_arm":clamp_arm,
+    # "clamp_arm_mirror":clamp_arm_mirror,
     # angle_adjustment_screw,
     # angle_adjustment_nut,
     # plate_handle_shaft,
@@ -182,7 +182,7 @@ shapes_to_print = {
 
 from pathlib import Path
 for key,shape in shapes_to_print.items():
-    suffix = "v1"
+    suffix = "v2"
     filename = Path("..")/Path(f"{key}_{suffix}.step")
     export_step(shape,filename)
     filename = Path("..")/Path(f"{key}_{suffix}.stl")
